@@ -369,7 +369,7 @@ static void ensure_cell_count(ErrorList* errors, const TableRows* rows, const Ta
 
 static const TableCells* get_table_cells(Token* token) {
     TableCells* table_cells = (TableCells*)malloc(sizeof(TableCells));
-    table_cells->cell_count = token->matched_items->count;
+    table_cells->cell_count = token->matched_items ? token->matched_items->count : 0;
     table_cells->table_cells = 0;
     if (table_cells->cell_count > 0) {
         table_cells->table_cells = (TableCell*)malloc(table_cells->cell_count * sizeof(TableCell));
