@@ -31,9 +31,11 @@ static void end_rule(ParserContext* context, RuleType rule_type);
 
 static int match_token(int state, Token* token, ParserContext* context);
 
-ParserContext* ParserContext_new(TokenScanner* token_scanner, TokenMatcher* token_matcher, Builder* builder, TokenQueue* token_queue, ErrorList* errors) {
+ParserContext* ParserContext_new(TokenScanner* token_scanner, TokenMatcher* token_matcher, Builder* builder,
+    TokenQueue* token_queue, ErrorList* errors, bool stop_at_first_error) {
+    
     ParserContext* parser_context = (ParserContext*)malloc(sizeof(ParserContext));
-    parser_context->stop_at_first_error = false;
+    parser_context->stop_at_first_error = stop_at_first_error;
     parser_context->token_scanner = token_scanner;
     parser_context->token_matcher = token_matcher;
     parser_context->builder = builder;
@@ -65,12 +67,17 @@ void Parser_delete(Parser* parser) {
 }
 
 int Parser_parse(Parser* parser, TokenMatcher* token_matcher, TokenScanner* token_scanner) {
+    ParserOptions parser_options = { /*stop_at_first_error = */false };
+    return Parser_parse_with_options(parser, token_matcher, token_scanner, parser_options);
+}
+
+int Parser_parse_with_options(Parser* parser, TokenMatcher* token_matcher, TokenScanner* token_scanner, ParserOptions parser_options) {
     parser->builder->reset(parser->builder);
     parser->builder->set_error_context(parser->builder, parser->errors);
     token_matcher->reset(token_matcher);
     token_matcher->errors = parser->errors;
     TokenQueue* token_queue = TokenQueue_new();
-    ParserContext* context = ParserContext_new(token_scanner, token_matcher, parser->builder, token_queue, parser->errors);
+    ParserContext* context = ParserContext_new(token_scanner, token_matcher, parser->builder, token_queue, parser->errors, parser_options.stop_at_first_error);
 
     int val = 0;
     jmp_buf env;

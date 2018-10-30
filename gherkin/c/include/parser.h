@@ -14,11 +14,17 @@ extern "C" {
 
 typedef struct Parser Parser;
 
+typedef struct ParserOptions {
+    bool stop_at_first_error;
+} ParserOptions;
+
 Parser* Parser_new(Builder* builder);
 
 void Parser_delete(Parser* parser);
 
 int Parser_parse(Parser* parser, TokenMatcher* token_matcher, TokenScanner* token_scanner);
+
+int Parser_parse_with_options(Parser* parser, TokenMatcher* token_matcher, TokenScanner* token_scanner, ParserOptions parser_options);
 
 bool Parser_has_more_errors(Parser* parser);
 
